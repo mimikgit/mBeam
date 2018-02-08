@@ -1,0 +1,19 @@
+
+Adding a image to the mimik container
+curl -i -F "image=@beam-v1.tar" http://localhost:8083/mcm/v1/images
+
+
+Creating a container from the image uploaded
+curl -i -d '{"name": "beam-v1", "image": "beam-v1", "env": {"MCM.BASE_API_PATH": "/beam/v1", "MCM.WEBSOCKET_SUPPORT": "true"}}' http://localhost:8083/mcm/v1/containers
+
+Delete a container
+curl -i -X DELETE http://localhost:8083/mcm/v1/containers/drive
+
+
+Delete a image
+curl -i -X DELETE http://localhost:8083/mcm/v1/images/drive
+
+
+
+
+curl -i -H 'Authorization: Bearer pBQvQQXdxLHalgdOvaCv' http://localhost:8083/mcm/v1/containers
