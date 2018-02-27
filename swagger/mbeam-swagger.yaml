@@ -1,0 +1,159 @@
+swagger: '2.0'
+info:
+  version: "1.0.1"
+  title: mBeam API
+  description: |
+        This microsevice is defined to do the following:
+        • Provids a queue of links to the shared media.
+        • Beams content from a node to another node, through an API call.
+  contact:
+    name: mimik
+    url: 'https://mimik.com/use-cases/'
+    email: support.sdk@mimik.com
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+basePath: /beam/v1
+paths:
+  /play_queue:
+    get:
+      description: |
+        Get a list of item posted.  Currently the maximum kept in this play_queue is 5 items
+      
+      responses:
+        200: 
+          description: Successful response
+          schema:
+            $ref: '#/definitions/ItemList'
+            
+    post:
+      description: |
+        Creates an 'item' object on the target machine's play queue.
+
+      parameters:
+        - name: item
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/MediaMetadata'
+
+      responses:
+        200:
+          description: Successful response, returns the item added
+          schema:
+            $ref: '#/definitions/MediaMetadata'
+        400: 
+          description: One of the required fields of the Item is not there.  The response of the body is empty.  
+  /play_queue/{id}:
+    get:
+      description: |
+        Get the item with id from the play_queue
+      parameters:
+        - name: id
+          in: path
+          description: |
+            The id of the item
+          required: true
+          type: string
+      responses:
+        200:
+          description: Successful response, returns the object requested
+          schema:
+            $ref: '#/definitions/MediaMetadata'
+        400:
+          description: Error, item does not exist
+    delete:
+      description: |
+        Remove the item with id from the play_queue
+      parameters:
+        - name: id
+          in: path
+          description: |
+            The id of the item
+          required: true
+          type: string
+      responses:
+        200:
+          description: Successful response, returns item which was deleted
+          schema:
+            $ref: '#/definitions/MediaMetadata'
+        400:
+          description: Error, item does not exist
+  /files:
+    get:
+      description: |
+        Get the file for the given id
+      parameters:
+        - name: id
+          in: query
+          description: |
+            The id of the item
+          required: true
+          type: string
+      responses:
+        200:
+          description: Successful response, contents of file
+        400: 
+          description: Bad Request, missing id query parameter, or generic Error
+          schema:
+            $ref: '#/definitions/Error'
+
+definitions:
+  ItemList:
+    properties:
+      data:
+        description: |
+          an array of the item
+        type: array
+        items: 
+          $ref: '#/definitions/MediaMetadata'
+  MediaMetadata:
+    properties:
+      id:
+        type: string
+        example: "001f7591-4102-4cd6-9ece-e21f03cc0d5f"
+      name:
+        type: string
+        example: "IMG_20171205_101453015.jpg"
+      mimeType:
+        type: string
+        example: "image/jpeg"
+      url:
+        type: string
+        example: "http://172.22.2.20:8083/beam/v1/files?id=eyJiIjoiaW1hZ2UvanBlZyIsImMiOiIvc3RvcmFnZS9lbXVsYXRlZC8wL0FuZHJvaWQvZGF0YS9jb20ubWltaWsuYWNjZXNzL2NhY2hlL21pbWlrX2NhY2hlL0wzTjBiM0poWjJVdlpXMTFiR0YwWldRdk1DOUVRMGxOTDBOaGJXVnlZUzlKVFVkZk1qQXhOekV5TURWZk1UQXhORFV6TURFMUxtcHdady5qcGcifQ=="
+      nodeId:
+        type: string
+        example: "d9bd4359cd0ba52c"
+      thumbnailContentHint:
+        type: object
+        $ref: '#/definitions/ThumbnailContentHint'
+      createTime:
+        type: string
+        example: "2018-02-13T23:12:20.006Z"
+  ThumbnailContentHint:
+    required:
+      - image
+      - mimeType
+    properties:
+      image:
+        type: string
+        description: |
+          The thumbnail data encoded with URL-safe Base64 (RFC 4648 section 5).
+      mimeType:
+        type: string
+        description: |
+          The MIME type of the thumbnail.
+  Error:
+    required:
+      - error
+    properties:
+      error:
+        $ref: '#/definitions/Error_error'
+  Error_error:
+    properties:
+      code:
+        type: integer
+        description: Must be the same as the HTTP status code.
+      message:
+        type: string
+        description: A human readable code
