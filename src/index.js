@@ -1,6 +1,7 @@
 import Router from 'router';
 import Action from 'action-js';
 import queryString from 'query-string';
+import jwt from './jwt';
 
 class ApiError extends Error {
   constructor(code, message) {
@@ -32,18 +33,18 @@ function base64Dec(base64) {
 // https://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
 function generateUUID() {
   /* eslint-disable */
-  var lut = []; for (var i=0; i < 256; i++) { 
-    lut[i] = (i<16?'0':'')+(i).toString(16);
+  var lut = []; for (var i = 0; i < 256; i++) {
+    lut[i] = (i < 16 ? '0' : '') + (i).toString(16);
   }
 
-  var d0 = Math.random()*0xffffffff|0;
-  var d1 = Math.random()*0xffffffff|0;
-  var d2 = Math.random()*0xffffffff|0;
-  var d3 = Math.random()*0xffffffff|0;
-  return lut[d0&0xff]+lut[d0>>8&0xff]+lut[d0>>16&0xff]+lut[d0>>24&0xff]+'-'+
-    lut[d1&0xff]+lut[d1>>8&0xff]+'-'+lut[d1>>16&0x0f|0x40]+lut[d1>>24&0xff]+'-'+
-    lut[d2&0x3f|0x80]+lut[d2>>8&0xff]+'-'+lut[d2>>16&0xff]+lut[d2>>24&0xff]+
-    lut[d3&0xff]+lut[d3>>8&0xff]+lut[d3>>16&0xff]+lut[d3>>24&0xff];
+  var d0 = Math.random() * 0xffffffff | 0;
+  var d1 = Math.random() * 0xffffffff | 0;
+  var d2 = Math.random() * 0xffffffff | 0;
+  var d3 = Math.random() * 0xffffffff | 0;
+  return lut[d0 & 0xff] + lut[d0 >> 8 & 0xff] + lut[d0 >> 16 & 0xff] + lut[d0 >> 24 & 0xff] + '-' +
+    lut[d1 & 0xff] + lut[d1 >> 8 & 0xff] + '-' + lut[d1 >> 16 & 0x0f | 0x40] + lut[d1 >> 24 & 0xff] + '-' +
+    lut[d2 & 0x3f | 0x80] + lut[d2 >> 8 & 0xff] + '-' + lut[d2 >> 16 & 0xff] + lut[d2 >> 24 & 0xff] +
+    lut[d3 & 0xff] + lut[d3 >> 8 & 0xff] + lut[d3 >> 16 & 0xff] + lut[d3 >> 24 & 0xff];
   /* eslint-enable */
 }
 
@@ -129,6 +130,13 @@ app.get('/play_queue/:itemId', (req, res) => {
   res.end(item);
 });
 
+app.post('/token', (req, res) => {
+  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.5mhBHqs5_DTLdINd9p5m7ZJ6XD0Xc55kIaCRY5r6HRA';
+  const p = jwt.decode(token,
+    'test', false, 'HS256');
+  res.end(JSON.stringify(p, null, 2));
+});
+
 app.post('/play_queue', (req, res) => {
   if (!req.body) {
     res.writeError(new ApiError('missing JSON body'));
@@ -144,24 +152,24 @@ app.post('/play_queue', (req, res) => {
       cb(item);
     }
   })
-  .next((item) => {
-    const json = JSON.stringify(item);
-    req.mimikContext.storage.setItem(item.id, json);
-    return item;
-  })
-  .next((item) => {
-    req.mimikContext.dispatchWebSocketEvent();
-    return item;
-  })
-  .next((item) => {
-    const json = toJson(item);
-    res.end(json);
-  })
-  .guard((e) => {
-    // caught error
-    res.writeError(new ApiError(400, e.message));
-  })
-  .go();
+    .next((item) => {
+      const json = JSON.stringify(item);
+      req.mimikContext.storage.setItem(item.id, json);
+      return item;
+    })
+    .next((item) => {
+      req.mimikContext.dispatchWebSocketEvent();
+      return item;
+    })
+    .next((item) => {
+      const json = toJson(item);
+      res.end(json);
+    })
+    .guard((e) => {
+      // caught error
+      res.writeError(new ApiError(400, e.message));
+    })
+    .go();
 });
 
 app.delete('/play_queue/:itemId', (req, res) => {
