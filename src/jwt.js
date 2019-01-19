@@ -16,6 +16,18 @@ const typeMap = {
   RS256: 'sign',
 };
 
+const base64urlEscape = (base64) => {
+  const e = base64.replace(/\+/g, '-')
+    .replace(/\//g, '_').replace(/=/g, '');
+
+  return e;
+};
+
+const base64urlEncode = (base64) => {
+  const b64 = Duktape.enc('base64', base64);
+  return base64urlEscape(b64);
+};
+
 const base64urlDecode = (base64) => {
   try {
     const diff = base64.length % 4;
@@ -34,13 +46,6 @@ const base64urlDecode = (base64) => {
     console.error(e.message);
     return '';
   }
-};
-
-const base64urlEscape = (base64) => {
-  const e = base64.replace(/\+/g, '-')
-    .replace(/\//g, '_').replace(/=/g, '');
-
-  return e;
 };
 
 function sign(input, key, method, type) {
@@ -116,4 +121,34 @@ jwt.decode = (token, key, noVerify, algorithm) => {
   }
 
   return payload;
+};
+
+jwt.encode = (payload, key, alg) => {
+  // Check key
+  if (!key) {
+    throw new Error('Require key');
+  }
+
+  // Check algorithm, default is HS256
+  const algorithm = alg || 'HS256';
+
+  const signingMethod = algorithmMap[algorithm];
+  const signingType = typeMap[algorithm];
+  if (!signingMethod || !signingType) {
+    throw new Error('Algorithm not supported');
+  }
+
+  // header, typ is fixed value.
+  const header = { typ: 'JWT', alg: algorithm };
+  // if (options && options.header) {
+  //   assignProperties(header, options.header);
+  // }
+
+  // create segments, all segments should be base64 string
+  const segments = [];
+  segments.push(base64urlEncode(JSON.stringify(header)));
+  segments.push(base64urlEncode(JSON.stringify(payload)));
+  segments.push(sign(segments.join('.'), key, signingMethod, signingType));
+
+  return segments.join('.');
 };

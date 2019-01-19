@@ -131,10 +131,25 @@ app.get('/play_queue/:itemId', (req, res) => {
 });
 
 app.post('/token', (req, res) => {
-  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.5mhBHqs5_DTLdINd9p5m7ZJ6XD0Xc55kIaCRY5r6HRA';
-  const p = jwt.decode(token,
-    'test', false, 'HS256');
-  res.end(JSON.stringify(p, null, 2));
+  // const token
+  // const p = jwt.decode(token,
+  //   'test', false, 'HS256');
+  // res.end(JSON.stringify(p, null, 2));
+
+  if (!req.body) {
+    res.writeError(new ApiError('missing JSON body'));
+    return;
+  }
+
+  const json = req.body;
+  const tokenRequest = JSON.parse(json);
+  const token = jwt.encode({
+    jti: generateUUID(),
+    u: tokenRequest.url,
+    exp: tokenRequest.exp,
+  }, 'test');
+
+  res.end(token);
 });
 
 app.post('/play_queue', (req, res) => {
