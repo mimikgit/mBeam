@@ -131,11 +131,6 @@ app.get('/play_queue/:itemId', (req, res) => {
 });
 
 app.post('/token', (req, res) => {
-  // const token
-  // const p = jwt.decode(token,
-  //   'test', false, 'HS256');
-  // res.end(JSON.stringify(p, null, 2));
-
   if (!req.body) {
     res.writeError(new ApiError('missing JSON body'));
     return;
@@ -228,13 +223,15 @@ app.get('/files', (req, res) => {
   const fileId = query.id;
 
   try {
+    // const token
+    // const p = jwt.decode(token,
+    //   'test', false, 'HS256');
     const json = base64Dec(fileId);
 
     const beamFile = JSON.parse(json);
     const mimeType = beamFile.b;
     const url = beamFile.c;
 
-    // console.log(`${mimeType}:${url}`);
     res.writeMimeFile(url, mimeType);
   } catch (e) {
     res.writeError(new ApiError(400, e.message));
