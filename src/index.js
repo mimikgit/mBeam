@@ -141,15 +141,32 @@ app.post('/token', (req, res) => {
     return;
   }
 
-  const json = req.body;
-  const tokenRequest = JSON.parse(json);
-  const token = jwt.encode({
-    jti: generateUUID(),
-    u: tokenRequest.url,
-    exp: tokenRequest.exp,
-  }, 'test');
+  new Action((cb) => {
+    const json = req.body;
+    const tokenRequest = JSON.parse(json);
+    const { url, mimeType, exp } = tokenRequest;
+    const token = jwt.encode({
+      jti: generateUUID(),
+      b: mimeType,
+      c: url,
+      exp,
+    }, 'test');
 
-  res.end(token);
+    const data = {
+      token,
+      url: `/files?id=${token}`,
+    };
+
+    cb(JSON.stringify({ data }));
+  })
+    .next((data) => {
+      res.end(data);
+    })
+    .guard((e) => {
+      // caught error
+      res.writeError(new ApiError(400, e.message));
+    })
+    .go();
 });
 
 app.post('/play_queue', (req, res) => {
