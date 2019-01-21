@@ -18,18 +18,6 @@ function toJson(obj) {
   return JSON.stringify(obj, null, 2);
 }
 
-function base64Dec(base64) {
-  try {
-    const data = base64
-      .replace(/-/g, '+')
-      .replace(/_/g, '/');
-    return new TextDecoder().decode(Duktape.dec('base64', data));
-  } catch (e) {
-    console.error(e.message);
-    return '';
-  }
-}
-
 // https://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
 function generateUUID() {
   /* eslint-disable */
@@ -137,15 +125,16 @@ app.post('/token', (req, res) => {
   }
 
   new Action((cb) => {
+    const { signatureKey } = req.mimikContext.env;
     const json = req.body;
     const tokenRequest = JSON.parse(json);
-    const { url, mimeType, exp } = tokenRequest;
+    const { url, mimeType, expIn } = tokenRequest;
     const token = jwt.encode({
       jti: generateUUID(),
       b: mimeType,
       c: url,
-      exp,
-    }, 'test');
+      exp: new Date(new Date().getTime() + (expIn * 1000)).getTime(),
+    }, signatureKey);
 
     const data = {
       token,
@@ -223,12 +212,10 @@ app.get('/files', (req, res) => {
   const fileId = query.id;
 
   try {
-    // const token
-    // const p = jwt.decode(token,
-    //   'test', false, 'HS256');
-    const json = base64Dec(fileId);
+    const { signatureKey } = req.mimikContext.env;
+    const beamFile = jwt.decode(fileId,
+      signatureKey, false, 'HS256');
 
-    const beamFile = JSON.parse(json);
     const mimeType = beamFile.b;
     const url = beamFile.c;
 
