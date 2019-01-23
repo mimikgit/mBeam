@@ -129,11 +129,12 @@ app.post('/token', (req, res) => {
     const json = req.body;
     const tokenRequest = JSON.parse(json);
     const { url, mimeType, expIn } = tokenRequest;
+    const exp = Math.round(new Date(new Date().getTime() + (expIn * 1000)).getTime() / 1000);
     const token = jwt.encode({
       jti: generateUUID(),
       b: mimeType,
       c: url,
-      exp: new Date(new Date().getTime() + (expIn * 1000)).getTime() / 1000,
+      exp,
     }, signatureKey);
 
     const data = {
