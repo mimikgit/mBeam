@@ -120,7 +120,7 @@ app.get('/play_queue/:itemId', (req, res) => {
 
 app.post('/token', (req, res) => {
   if (!req.body) {
-    res.writeError(new ApiError('missing JSON body'));
+    res.writeError(new ApiError(400, 'missing JSON body'));
     return;
   }
 
@@ -133,7 +133,7 @@ app.post('/token', (req, res) => {
       jti: generateUUID(),
       b: mimeType,
       c: url,
-      exp: new Date(new Date().getTime() + (expIn * 1000)).getTime(),
+      exp: new Date(new Date().getTime() + (expIn * 1000)).getTime() / 1000,
     }, signatureKey);
 
     const data = {
@@ -221,6 +221,6 @@ app.get('/files', (req, res) => {
 
     res.writeMimeFile(url, mimeType);
   } catch (e) {
-    res.writeError(new ApiError(400, e.message));
+    res.writeError(new ApiError(403, e.message));
   }
 });
