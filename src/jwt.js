@@ -1,4 +1,5 @@
 import sha256 from 'fast-sha256';
+import { base64urlEscape, base64urlEncode, base64urlDecode } from './helper/base64';
 
 const jwt = module.exports;
 
@@ -14,38 +15,6 @@ const typeMap = {
   HS384: 'hmac',
   HS512: 'hmac',
   RS256: 'sign',
-};
-
-const base64urlEscape = (base64) => {
-  const e = base64.replace(/\+/g, '-')
-    .replace(/\//g, '_').replace(/=/g, '');
-
-  return e;
-};
-
-const base64urlEncode = (base64) => {
-  const b64 = Duktape.enc('base64', base64);
-  return base64urlEscape(b64);
-};
-
-const base64urlDecode = (base64) => {
-  try {
-    const diff = base64.length % 4;
-
-    let data = base64
-      .replace(/-/g, '+')
-      .replace(/_/g, '/');
-
-    if (diff) {
-      const padLength = 4 - diff;
-      data += '='.repeat(padLength);
-    }
-
-    return new TextDecoder().decode(Duktape.dec('base64', data));
-  } catch (e) {
-    console.error(e.message);
-    return '';
-  }
 };
 
 function sign(input, key, method, type) {

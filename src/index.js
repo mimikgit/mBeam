@@ -2,6 +2,7 @@ import Router from 'router';
 import Action from 'action-js';
 import queryString from 'query-string';
 import jwt from './jwt';
+import { base64urlDecode } from './helper/base64';
 
 class ApiError extends Error {
   constructor(code, message) {
@@ -211,16 +212,33 @@ app.get('/files', (req, res) => {
   }
 
   const fileId = query.id;
+  const ownerCode = query.ownerCode;
 
+  // need to differentiate between virtualme access and mimik'd access
   try {
-    const { signatureKey } = req.mimikContext.env;
-    const beamFile = jwt.decode(fileId,
-      signatureKey, false, 'HS256');
+    if (ownerCode) {
+      if (ownerCode !== req.mimikContext.env.ownerCode) {
+        res.writeError(new ApiError(403, 'incorrect owner code'));
+        return;
+      }
+      console.log(`files fileId: ${fileId}`);
+      const json = base64urlDecode(fileId);
+      console.log(`files json: ${json}`);
+      const beamFile = JSON.parse(json);
+      const mimeType = beamFile.b;
+      const url = beamFile.c;
 
-    const mimeType = beamFile.b;
-    const url = beamFile.c;
+      res.writeMimeFile(url, mimeType);
+    } else {
+      const { signatureKey } = req.mimikContext.env;
+      const beamFile = jwt.decode(fileId,
+        signatureKey, false, 'HS256');
 
-    res.writeMimeFile(url, mimeType);
+      const mimeType = beamFile.b;
+      const url = beamFile.c;
+
+      res.writeMimeFile(url, mimeType);
+    }
   } catch (e) {
     res.writeError(new ApiError(403, e.message));
   }
