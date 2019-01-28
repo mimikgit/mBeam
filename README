@@ -1,0 +1,38 @@
+/token:
+Method: POST
+Description: Tokenizes a file object to provide remote access with an expiration
+Parameters: 
+  Object (body)
+    application/json
+    {“url”: "filePath", “mimeType”: “raw”, “expIn”: 123}
+      url: path of the file accessible by mbeam microservice
+      mimeType: file mime type
+      expIn: number of seconds before the token expires
+Response:
+  200:
+    {"data": {"token": "jwttoken", "url": "/files?id=jwttoken"} }
+        token: jwt token representing the file. The token is generated using the signatureKey parameter in the beam microservice environment configuration
+        url: beam api path to access file
+  400:
+    Missing json body
+    Require key
+
+/files:
+Method: GET
+Description: Provides access to files accessible by beam microservice
+Parameters: 
+  ownerCode (query)
+    String secret key to be checked against beam microservice environment configuration, API will respond with an error if present and incorrect
+  id (query)
+    Id token based on ownerCode presence
+      if ownerCode is present: A base64 encoded json containing the following object
+        {"b": "someMimeType", "c": "filePath"}
+      if ownerCode is not present: A jwt token provided by /token API
+Response: 
+  200:
+    The file requested.
+  403:
+    Owner code does not match.
+    Token could not be validated.
+    Token expired.
+    File not accessible
