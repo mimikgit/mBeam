@@ -1,3 +1,10 @@
+Environment variables:
+  Environment variables are only accessible through the MCM containers API, which requires an access token matching the associated account, and are thus considered secure
+    signatureKey: String key used to sign jwt tokens
+      Suggested value: a generated UUID string
+    ownerCode: String key used to verify ownership of files for bypassing file link expiration
+      Suggested value: a generated UUID string
+
 /token:
 Method: POST
 Description: Tokenizes a file object to provide remote access with an expiration
