@@ -1,6 +1,8 @@
 import Router from 'router';
 import Action from 'action-js';
 import queryString from 'query-string';
+import jwt from './jwt';
+import { base64urlDecode } from './helper/base64';
 
 class ApiError extends Error {
   constructor(code, message) {
@@ -17,33 +19,21 @@ function toJson(obj) {
   return JSON.stringify(obj, null, 2);
 }
 
-function base64Dec(base64) {
-  try {
-    const data = base64
-      .replace(/-/g, '+')
-      .replace(/_/g, '/');
-    return new TextDecoder().decode(Duktape.dec('base64', data));
-  } catch (e) {
-    console.error(e.message);
-    return '';
-  }
-}
-
 // https://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
 function generateUUID() {
   /* eslint-disable */
-  var lut = []; for (var i=0; i < 256; i++) { 
-    lut[i] = (i<16?'0':'')+(i).toString(16);
+  var lut = []; for (var i = 0; i < 256; i++) {
+    lut[i] = (i < 16 ? '0' : '') + (i).toString(16);
   }
 
-  var d0 = Math.random()*0xffffffff|0;
-  var d1 = Math.random()*0xffffffff|0;
-  var d2 = Math.random()*0xffffffff|0;
-  var d3 = Math.random()*0xffffffff|0;
-  return lut[d0&0xff]+lut[d0>>8&0xff]+lut[d0>>16&0xff]+lut[d0>>24&0xff]+'-'+
-    lut[d1&0xff]+lut[d1>>8&0xff]+'-'+lut[d1>>16&0x0f|0x40]+lut[d1>>24&0xff]+'-'+
-    lut[d2&0x3f|0x80]+lut[d2>>8&0xff]+'-'+lut[d2>>16&0xff]+lut[d2>>24&0xff]+
-    lut[d3&0xff]+lut[d3>>8&0xff]+lut[d3>>16&0xff]+lut[d3>>24&0xff];
+  var d0 = Math.random() * 0xffffffff | 0;
+  var d1 = Math.random() * 0xffffffff | 0;
+  var d2 = Math.random() * 0xffffffff | 0;
+  var d3 = Math.random() * 0xffffffff | 0;
+  return lut[d0 & 0xff] + lut[d0 >> 8 & 0xff] + lut[d0 >> 16 & 0xff] + lut[d0 >> 24 & 0xff] + '-' +
+    lut[d1 & 0xff] + lut[d1 >> 8 & 0xff] + '-' + lut[d1 >> 16 & 0x0f | 0x40] + lut[d1 >> 24 & 0xff] + '-' +
+    lut[d2 & 0x3f | 0x80] + lut[d2 >> 8 & 0xff] + '-' + lut[d2 >> 16 & 0xff] + lut[d2 >> 24 & 0xff] +
+    lut[d3 & 0xff] + lut[d3 >> 8 & 0xff] + lut[d3 >> 16 & 0xff] + lut[d3 >> 24 & 0xff];
   /* eslint-enable */
 }
 
@@ -129,6 +119,42 @@ app.get('/play_queue/:itemId', (req, res) => {
   res.end(item);
 });
 
+app.post('/token', (req, res) => {
+  if (!req.body) {
+    res.writeError(new ApiError(400, 'missing JSON body'));
+    return;
+  }
+
+  new Action((cb) => {
+    const { signatureKey } = req.mimikContext.env;
+    const json = req.body;
+    const tokenRequest = JSON.parse(json);
+    const { url, mimeType, expIn } = tokenRequest;
+    const exp = Math.round(new Date(new Date().getTime() + (expIn * 1000)).getTime() / 1000);
+    const token = jwt.encode({
+      jti: generateUUID(),
+      b: mimeType,
+      c: url,
+      exp,
+    }, signatureKey);
+
+    const data = {
+      token,
+      url: `/files?id=${token}`,
+    };
+
+    cb(JSON.stringify({ data }));
+  })
+    .next((data) => {
+      res.end(data);
+    })
+    .guard((e) => {
+      // caught error
+      res.writeError(new ApiError(400, e.message));
+    })
+    .go();
+});
+
 app.post('/play_queue', (req, res) => {
   if (!req.body) {
     res.writeError(new ApiError('missing JSON body'));
@@ -144,24 +170,24 @@ app.post('/play_queue', (req, res) => {
       cb(item);
     }
   })
-  .next((item) => {
-    const json = JSON.stringify(item);
-    req.mimikContext.storage.setItem(item.id, json);
-    return item;
-  })
-  .next((item) => {
-    req.mimikContext.dispatchWebSocketEvent();
-    return item;
-  })
-  .next((item) => {
-    const json = toJson(item);
-    res.end(json);
-  })
-  .guard((e) => {
-    // caught error
-    res.writeError(new ApiError(400, e.message));
-  })
-  .go();
+    .next((item) => {
+      const json = JSON.stringify(item);
+      req.mimikContext.storage.setItem(item.id, json);
+      return item;
+    })
+    .next((item) => {
+      req.mimikContext.dispatchWebSocketEvent();
+      return item;
+    })
+    .next((item) => {
+      const json = toJson(item);
+      res.end(json);
+    })
+    .guard((e) => {
+      // caught error
+      res.writeError(new ApiError(400, e.message));
+    })
+    .go();
 });
 
 app.delete('/play_queue/:itemId', (req, res) => {
@@ -186,17 +212,34 @@ app.get('/files', (req, res) => {
   }
 
   const fileId = query.id;
+  const ownerCode = query.ownerCode;
 
+  // need to differentiate between virtualme access and mimik'd access
   try {
-    const json = base64Dec(fileId);
+    if (ownerCode) {
+      if (ownerCode !== req.mimikContext.env.ownerCode) {
+        res.writeError(new ApiError(403, 'incorrect owner code'));
+        return;
+      }
+      console.log(`files fileId: ${fileId}`);
+      const json = base64urlDecode(fileId);
+      console.log(`files json: ${json}`);
+      const beamFile = JSON.parse(json);
+      const mimeType = beamFile.b;
+      const url = beamFile.c;
 
-    const beamFile = JSON.parse(json);
-    const mimeType = beamFile.b;
-    const url = beamFile.c;
+      res.writeMimeFile(url, mimeType);
+    } else {
+      const { signatureKey } = req.mimikContext.env;
+      const beamFile = jwt.decode(fileId,
+        signatureKey, false, 'HS256');
 
-    // console.log(`${mimeType}:${url}`);
-    res.writeMimeFile(url, mimeType);
+      const mimeType = beamFile.b;
+      const url = beamFile.c;
+
+      res.writeMimeFile(url, mimeType);
+    }
   } catch (e) {
-    res.writeError(new ApiError(400, e.message));
+    res.writeError(new ApiError(403, e.message));
   }
 });

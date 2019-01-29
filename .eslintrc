@@ -3,7 +3,8 @@
   "globals": {
     "mimikModule": true,
     "Duktape": true,
-    "TextDecoder": true
+    "TextDecoder": true,
+    "TextEncoder": true
   },
   "rules": {
       "linebreak-style": "off",
