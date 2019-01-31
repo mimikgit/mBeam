@@ -125,6 +125,18 @@ app.post('/token', (req, res) => {
     return;
   }
 
+  const query = queryString.parse(req._parsedUrl.query);
+  const { ownerCode } = query;
+  if (!ownerCode) {
+    res.writeError(new ApiError(403, 'missing ownerCode'));
+    return;
+  }
+
+  if (ownerCode !== req.mimikContext.env.ownerCode) {
+    res.writeError(new ApiError(403, 'incorrect owner code'));
+    return;
+  }
+
   new Action((cb) => {
     const { signatureKey } = req.mimikContext.env;
     const json = req.body;
