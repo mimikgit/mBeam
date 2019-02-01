@@ -5,16 +5,10 @@ const jwt = module.exports;
 
 const algorithmMap = {
   HS256: 'sha256',
-  HS384: 'sha384',
-  HS512: 'sha512',
-  RS256: 'RSA-SHA256',
 };
 
 const typeMap = {
   HS256: 'hmac',
-  HS384: 'hmac',
-  HS512: 'hmac',
-  RS256: 'sign',
 };
 
 function sign(input, key, method, type) {

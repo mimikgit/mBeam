@@ -152,6 +152,7 @@ app.post('/token', (req, res) => {
 
     const data = {
       token,
+      expires_in: exp,
       url: `/files?id=${token}`,
     };
 
