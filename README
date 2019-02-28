@@ -43,3 +43,43 @@ Response:
     Token could not be validated.
     Token expired.
     File not accessible
+
+/play_queue:
+Method: GET
+Description: Provides access to list of items that have been shared to this instance
+Parameters: 
+  ownerCode (query)
+    String secret key to be checked against beam microservice environment configuration, API will respond with an error if present and incorrect
+Response: 
+  200:
+    The list of items.
+  403:
+    incorrect owner code.
+
+/play_queue/{itemId}:
+Method: GET
+Description: Provides access to an item that has been shared to this instance
+Parameters: 
+  ownerCode (query)
+    String secret key to be checked against beam microservice environment configuration, API will respond with an error if present and incorrect
+Response: 
+  200:
+    The item requested.
+  400:
+    no such item: {itemId}
+  403:
+    incorrect owner code.
+
+/play_queue/{itemId}:
+Method: DELETE
+Description: Removes an item that has been shared to this instance
+Parameters: 
+  ownerCode (query)
+    String secret key to be checked against beam microservice environment configuration, API will respond with an error if present and incorrect
+Response: 
+  200:
+    The item removed.
+  400:
+    no such item: {itemId}
+  403:
+    incorrect owner code.
