@@ -5,13 +5,13 @@ Environment variables:
     ownerCode: String key used to verify ownership of files for bypassing file link expiration
       Suggested value: a generated UUID string
 
-/token:
+/token?ownerCode={}:
 Method: POST
 Description: Tokenizes a file object to provide remote access with an expiration
 Parameters: 
   Object (body)
     application/json
-    {“url”: "filePath", “mimeType”: “raw”, “expIn”: 123}
+    {"url": "filePath", "mimeType": "raw", "expIn": 123}
       url: path of the file accessible by mbeam microservice
       mimeType: file mime type
       expIn: number of seconds before the token expires
@@ -43,3 +43,43 @@ Response:
     Token could not be validated.
     Token expired.
     File not accessible
+
+/play_queue:
+Method: GET
+Description: Provides access to list of items that have been shared to this instance
+Parameters: 
+  ownerCode (query)
+    String secret key to be checked against beam microservice environment configuration, API will respond with an error if present and incorrect
+Response: 
+  200:
+    The list of items.
+  403:
+    incorrect owner code.
+
+/play_queue/{itemId}:
+Method: GET
+Description: Provides access to an item that has been shared to this instance
+Parameters: 
+  ownerCode (query)
+    String secret key to be checked against beam microservice environment configuration, API will respond with an error if present and incorrect
+Response: 
+  200:
+    The item requested.
+  400:
+    no such item: {itemId}
+  403:
+    incorrect owner code.
+
+/play_queue/{itemId}:
+Method: DELETE
+Description: Removes an item that has been shared to this instance
+Parameters: 
+  ownerCode (query)
+    String secret key to be checked against beam microservice environment configuration, API will respond with an error if present and incorrect
+Response: 
+  200:
+    The item removed.
+  400:
+    no such item: {itemId}
+  403:
+    incorrect owner code.

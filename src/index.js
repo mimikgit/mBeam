@@ -93,6 +93,12 @@ mimikModule.exports = (context, req, res) => {
 };
 
 app.get('/play_queue', (req, res) => {
+  const query = queryString.parse(req._parsedUrl.query);
+  const ownerCode = query.ownerCode;
+  if (!ownerCode || ownerCode !== req.mimikContext.env.ownerCode) {
+    res.writeError(new ApiError(403, 'incorrect owner code'));
+    return;
+  }
   const list = [];
   req.mimikContext.storage.eachItem((key, value) => {
     const item = JSON.parse(value);
@@ -107,6 +113,12 @@ app.get('/play_queue', (req, res) => {
 });
 
 app.get('/play_queue/:itemId', (req, res) => {
+  const query = queryString.parse(req._parsedUrl.query);
+  const ownerCode = query.ownerCode;
+  if (!ownerCode || ownerCode !== req.mimikContext.env.ownerCode) {
+    res.writeError(new ApiError(403, 'incorrect owner code'));
+    return;
+  }
   const { itemId } = req.params;
   const { storage } = req.mimikContext;
 
@@ -125,6 +137,18 @@ app.post('/token', (req, res) => {
     return;
   }
 
+  const query = queryString.parse(req._parsedUrl.query);
+  const { ownerCode } = query;
+  if (!ownerCode) {
+    res.writeError(new ApiError(403, 'missing ownerCode'));
+    return;
+  }
+
+  if (ownerCode !== req.mimikContext.env.ownerCode) {
+    res.writeError(new ApiError(403, 'incorrect owner code'));
+    return;
+  }
+
   new Action((cb) => {
     const { signatureKey } = req.mimikContext.env;
     const json = req.body;
@@ -140,6 +164,7 @@ app.post('/token', (req, res) => {
 
     const data = {
       token,
+      expires_in: exp,
       url: `/files?id=${token}`,
     };
 
@@ -194,6 +219,12 @@ app.delete('/play_queue/:itemId', (req, res) => {
   const { itemId } = req.params;
   const { storage } = req.mimikContext;
 
+  const query = queryString.parse(req._parsedUrl.query);
+  const ownerCode = query.ownerCode;
+  if (!ownerCode || ownerCode !== req.mimikContext.env.ownerCode) {
+    res.writeError(new ApiError(403, 'incorrect owner code'));
+    return;
+  }
   const item = storage.getItem(itemId);
   if (!item) {
     res.writeError(new ApiError(400, `no such item: ${itemId}`));
@@ -221,9 +252,9 @@ app.get('/files', (req, res) => {
         res.writeError(new ApiError(403, 'incorrect owner code'));
         return;
       }
-      console.log(`files fileId: ${fileId}`);
+      // console.log(`files fileId: ${fileId}`);
       const json = base64urlDecode(fileId);
-      console.log(`files json: ${json}`);
+      // console.log(`files json: ${json}`);
       const beamFile = JSON.parse(json);
       const mimeType = beamFile.b;
       const url = beamFile.c;
