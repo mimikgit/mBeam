@@ -1,5 +1,5 @@
 
-const makeQueueModel = require('../models/queueModel');
+const makeQueueModel = require('../models/queue');
 
 const Action = require('action-js');
 
