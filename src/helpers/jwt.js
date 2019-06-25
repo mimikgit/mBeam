@@ -1,5 +1,5 @@
 import sha256 from 'fast-sha256';
-import { base64urlEscape, base64urlEncode, base64urlDecode } from './helper/base64';
+import base64 from './base64';
 
 const jwt = module.exports;
 
@@ -25,7 +25,7 @@ function sign(input, key, method, type) {
     throw new Error('Algorithm type not recognized');
   }
 
-  return base64urlEscape(base64str);
+  return base64.urlEscape(base64str);
 }
 
 function verify(input, key, method, type, signature) {
@@ -52,8 +52,8 @@ jwt.decode = (token, key, noVerify, algorithm) => {
   const signatureSeg = segments[2];
 
   // base64 decode and parse JSON
-  const header = JSON.parse(base64urlDecode(headerSeg));
-  const payload = JSON.parse(base64urlDecode(payloadSeg));
+  const header = JSON.parse(base64.urlDecode(headerSeg));
+  const payload = JSON.parse(base64.urlDecode(payloadSeg));
 
   if (!noVerify) {
     // if (!algorithm && /BEGIN( RSA)? PUBLIC KEY/.test(key.toString())) {
@@ -109,8 +109,8 @@ jwt.encode = (payload, key, alg) => {
 
   // create segments, all segments should be base64 string
   const segments = [];
-  segments.push(base64urlEncode(JSON.stringify(header)));
-  segments.push(base64urlEncode(JSON.stringify(payload)));
+  segments.push(base64.urlEncode(JSON.stringify(header)));
+  segments.push(base64.urlEncode(JSON.stringify(payload)));
   segments.push(sign(segments.join('.'), key, signingMethod, signingType));
 
   return segments.join('.');

@@ -4,3 +4,6 @@
 [submodule "swagger-mw-codegen"]
 	path = swagger-mw-codegen
 	url = https://bitbucket.org/mimiktech/swagger-mw-codegen.git
+[submodule "src/edge-ms-helper"]
+	path = src/edge-ms-helper
+	url = https://bitbucket.org/mimiktech/edge-ms-helper.git

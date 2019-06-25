@@ -1,16 +1,16 @@
-export function base64urlEscape(base64) {
+function urlEscape(base64) {
   const e = base64.replace(/\+/g, '-')
     .replace(/\//g, '_').replace(/=/g, '');
 
   return e;
 }
 
-export function base64urlEncode(string) {
+function urlEncode(string) {
   const b64 = Duktape.enc('base64', string);
-  return base64urlEscape(b64);
+  return urlEscape(b64);
 }
 
-export function base64urlDecode(base64) {
+function urlDecode(base64) {
   try {
     const diff = base64.length % 4;
 
@@ -29,3 +29,9 @@ export function base64urlDecode(base64) {
     return '';
   }
 }
+
+module.exports = {
+  urlEscape,
+  urlEncode,
+  urlDecode,
+};

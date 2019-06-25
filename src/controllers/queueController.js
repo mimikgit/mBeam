@@ -1,33 +1,38 @@
-import response from '../helper/response';
-import queueProcessor from '../processors/queueProcessor';
+const makeQueueProcessor = require('../processors/queueProcessor');
+const response = require('../edge-ms-helper/response-helper');
 
 function createItem(req, res) {
-  const { mimikContext, body } = req;
-  queueProcessor.createItem(mimikContext, body)
+  const queueProcessor = makeQueueProcessor(req.context);
+
+  queueProcessor.createItem(req.body)
     .next((item => response.sendResult(item, 200, res)))
     .guard(err => response.sendError(err, 400, res))
     .go();
 }
 
 function getItemList(req, res) {
-  const { mimikContext } = req;
+  const { context } = req;
   const { ownerCode } = req.swagger.params;
-  if (ownerCode !== mimikContext.env.ownerCode) {
+  const queueProcessor = makeQueueProcessor(context);
+
+  if (ownerCode !== context.env.ownerCode) {
     response.sendError({ message: 'incorrect ownerCode' }, 403, res);
   } else {
-    queueProcessor.getItemList(mimikContext)
+    queueProcessor.getItemList()
       .next((data => response.sendResult({ data }, 200, res)))
       .go();
   }
 }
 
 function getItem(req, res) {
-  const { mimikContext } = req;
+  const { context } = req;
   const { ownerCode, id } = req.swagger.params;
-  if (ownerCode !== req.mimikContext.env.ownerCode) {
+  const queueProcessor = makeQueueProcessor(context);
+
+  if (ownerCode !== context.env.ownerCode) {
     response.sendError({ message: 'incorrect ownerCode' }, 403, res);
   } else {
-    queueProcessor.getItem(mimikContext, id)
+    queueProcessor.getItem(id)
       .next((item => response.sendResult(item, 200, res)))
       .guard(err => response.sendError(err, 400, res))
       .go();
@@ -35,13 +40,14 @@ function getItem(req, res) {
 }
 
 function deleteItem(req, res) {
-  const { mimikContext } = req;
+  const { context } = req;
   const { ownerCode, id } = req.swagger.params;
+  const queueProcessor = makeQueueProcessor(context);
 
-  if (ownerCode !== req.mimikContext.env.ownerCode) {
+  if (ownerCode !== context.env.ownerCode) {
     response.sendError({ message: 'incorrect ownerCode' }, 403, res);
   } else {
-    queueProcessor.deleteItem(mimikContext, id)
+    queueProcessor.deleteItem(id)
       .next((item => response.sendResult(item, 200, res)))
       .guard(err => response.sendError(err, 400, res))
       .go();
