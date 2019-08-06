@@ -32,9 +32,18 @@ function makeQueueModel(context) {
         mimeType: data.thumbnailContentHint.mimeType,
       },
       createTime: new Date(Date.now()).toISOString(),
+      readStatus: ((data.readStatus === 'read'
+        || data.readStatus === 'unread')
+        && data.readStatus)
+        || 'unread',
     };
     storage.setItem(item.id, JSON.stringify(item));
     return item;
+  }
+
+  function update(data) {
+    storage.setItem(data.id, JSON.stringify(data));
+    return data;
   }
 
   return {
@@ -42,6 +51,7 @@ function makeQueueModel(context) {
     getAll,
     remove,
     insert,
+    update,
   };
 }
 
