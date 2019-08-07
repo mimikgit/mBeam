@@ -32,7 +32,10 @@ function makeQueueModel(context) {
         mimeType: data.thumbnailContentHint.mimeType,
       },
       createTime: new Date(Date.now()).toISOString(),
-      readStatus: data.readStatus,
+      readStatus: ((data.readStatus === 'read'
+              || data.readStatus === 'unread')
+              && data.readStatus)
+              || 'unread',
     };
     storage.setItem(item.id, JSON.stringify(item));
     return item;
