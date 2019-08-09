@@ -110,6 +110,15 @@ const createItemParams = [
         "createTime": {
           "type": "string",
           "example": "2018-02-13T23:12:20.006Z"
+        },
+        "readStatus": {
+          "type": "string",
+          "enum": [
+            "read",
+            "unread"
+          ],
+          "example": "unread",
+          "default": "unread"
         }
       }
     }
@@ -147,6 +156,41 @@ const getItemParams = [
 ];
 /* eslint-enable */
 mw.get('/play_queue/:id', swaggerParams(getItemParams), queueController.getItem);
+
+/* eslint-disable */
+const setItemReadStatusParams = [
+  {
+    "in": "path",
+    "name": "id",
+    "required": true,
+    "hasSchema": false
+  },
+  {
+    "in": "query",
+    "name": "ownerCode",
+    "required": true,
+    "hasSchema": false
+  },
+  {
+    "in": "body",
+    "name": "queueUpdate",
+    "required": true,
+    "hasSchema": true,
+    "schema": {
+      "properties": {
+        "readStatus": {
+          "type": "string",
+          "enum": [
+            "read",
+            "unread"
+          ]
+        }
+      }
+    }
+  }
+];
+/* eslint-enable */
+mw.put('/play_queue/:id', swaggerParams(setItemReadStatusParams), queueController.setItemReadStatus);
 
 /* eslint-disable */
 const deleteItemParams = [

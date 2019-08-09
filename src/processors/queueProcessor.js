@@ -39,11 +39,23 @@ function makeQueueProcessor(context) {
       });
   }
 
+  function setReadStatus(itemId, queueUpdate) {
+    return getItem(itemId)
+      .next((item) => {
+        const update = {
+          ...item,
+          readStatus: queueUpdate.readStatus,
+        };
+        return queueModel.update(update);
+      });
+  }
+
   return {
     createItem,
     getItemList,
     getItem,
     deleteItem,
+    setReadStatus,
   };
 }
 

@@ -54,9 +54,25 @@ function deleteItem(req, res) {
   }
 }
 
+function setItemReadStatus(req, res) {
+  const { context } = req;
+  const { ownerCode, id, queueUpdate } = req.swagger.params;
+  const queueProcessor = makeQueueProcessor(context);
+
+  if (ownerCode !== context.env.ownerCode) {
+    response.sendError({ message: 'incorrect ownerCode' }, 403, res);
+  } else {
+    queueProcessor.setReadStatus(id, queueUpdate)
+      .next((item => response.sendResult(item, 200, res)))
+      .guard(err => response.sendError(err, 400, res))
+      .go();
+  }
+}
+
 module.exports = {
   createItem,
   getItemList,
   getItem,
   deleteItem,
+  setItemReadStatus,
 };
