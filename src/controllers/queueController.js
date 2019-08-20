@@ -3,11 +3,11 @@ const response = require('../edge-ms-helper/response-helper');
 
 function createItem(req, res) {
   const { context } = req;
-  const { ownerCode } = req.swagger.params;
+  const { ownerCode, item } = req.swagger.params;
   const queueProcessor = makeQueueProcessor(req.context);
 
-  queueProcessor.createItem(req.body, !!ownerCode && ownerCode === context.env.ownerCode)
-    .next((item => response.sendResult(item, 200, res)))
+  queueProcessor.createItem(item, !!ownerCode && ownerCode === context.env.ownerCode)
+    .next((createdItem => response.sendResult(createdItem, 200, res)))
     .guard(err => response.sendError(err, 400, res))
     .go();
 }

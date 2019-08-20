@@ -6,9 +6,8 @@ const Action = require('action-js');
 function makeQueueProcessor(context) {
   const queueModel = makeQueueModel(context);
 
-  function createItem(body, useDeletableTime) {
+  function createItem(json, useDeletableTime) {
     return new Action((cb) => {
-      const json = JSON.parse(body);
       cb(queueModel.insert(json, useDeletableTime));
     })
       .next((item) => {
