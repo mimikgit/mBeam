@@ -2,9 +2,11 @@ const makeQueueProcessor = require('../processors/queueProcessor');
 const response = require('../edge-ms-helper/response-helper');
 
 function createItem(req, res) {
+  const { context } = req;
+  const { ownerCode } = req.swagger.params;
   const queueProcessor = makeQueueProcessor(req.context);
 
-  queueProcessor.createItem(req.body)
+  queueProcessor.createItem(req.body, ownerCode === context.env.ownerCode)
     .next((item => response.sendResult(item, 200, res)))
     .guard(err => response.sendError(err, 400, res))
     .go();
