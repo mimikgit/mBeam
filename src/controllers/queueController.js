@@ -6,7 +6,7 @@ function createItem(req, res) {
   const { ownerCode } = req.swagger.params;
   const queueProcessor = makeQueueProcessor(req.context);
 
-  queueProcessor.createItem(req.body, ownerCode === context.env.ownerCode)
+  queueProcessor.createItem(req.body, !!ownerCode && ownerCode === context.env.ownerCode)
     .next((item => response.sendResult(item, 200, res)))
     .guard(err => response.sendError(err, 400, res))
     .go();
