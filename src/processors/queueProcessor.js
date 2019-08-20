@@ -6,13 +6,13 @@ const Action = require('action-js');
 function makeQueueProcessor(context) {
   const queueModel = makeQueueModel(context);
 
-  function createItem(json, useDeletableTime) {
+  function createItem(item, useDeletableTime) {
     return new Action((cb) => {
-      cb(queueModel.insert(json, useDeletableTime));
+      cb(queueModel.insert(item, useDeletableTime));
     })
-      .next((item) => {
+      .next((createdItem) => {
         context.dispatchWebSocketEvent();
-        return item;
+        return createdItem;
       });
   }
 
