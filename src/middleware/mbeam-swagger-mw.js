@@ -56,6 +56,12 @@ const swaggerParams = params => (req, res, next) => {
 /* eslint-disable */
 const createItemParams = [
   {
+    "in": "query",
+    "name": "ownerCode",
+    "required": false,
+    "hasSchema": false
+  },
+  {
     "in": "body",
     "name": "item",
     "required": true,
@@ -119,6 +125,11 @@ const createItemParams = [
           ],
           "example": "unread",
           "default": "unread"
+        },
+        "deletableTime": {
+          "type": "string",
+          "description": "Time after which the beam item can be deleted",
+          "example": "2018-02-13T23:12:20.006Z"
         }
       }
     }

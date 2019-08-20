@@ -20,7 +20,7 @@ function makeQueueModel(context) {
     return storage.removeItem(itemId);
   }
 
-  function insert(data) {
+  function insert(data, useDeletableTime) {
     const item = {
       id: uuid.generate(),
       name: data.name,
@@ -36,6 +36,7 @@ function makeQueueModel(context) {
               || data.readStatus === 'unread')
               && data.readStatus)
               || 'unread',
+      deletableTime: useDeletableTime && data.deletableTime,
     };
     storage.setItem(item.id, JSON.stringify(item));
     return item;
