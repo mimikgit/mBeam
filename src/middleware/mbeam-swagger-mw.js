@@ -128,6 +128,7 @@ const createItemParams = [
         },
         "deletableTime": {
           "type": "string",
+          "format": "date-time",
           "description": "Time after which the beam item can be deleted",
           "example": "2018-02-13T23:12:20.006Z"
         }
