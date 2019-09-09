@@ -36,7 +36,7 @@ function makeQueueModel(context) {
               || data.readStatus === 'unread')
               && data.readStatus)
               || 'unread',
-      deletableTime: useDeletableTime && data.deletableTime,
+      deletableTime: (useDeletableTime && data.deletableTime) || undefined,
     };
     storage.setItem(item.id, JSON.stringify(item));
     return item;
