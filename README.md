@@ -6,6 +6,16 @@
   * ownerCode: String key used to verify ownership of files for bypassing file link expiration
     Suggested value: a generated UUID string
 
+## Use of Git submodule
+```
+git submodule update --init
+```
+
+## Bitbucket NPM Module Repository
+NPM uspports Bitbucket as an npm module repository.  However, You will require to setup Bitbucket SSH Key if it is not done previously.  
+Please follow the instruction below to setup the BitBucket SSH Key.
+https://confluence.atlassian.com/bitbucket/set-up-an-ssh-key-728138079.html
+
 ## Building
 1. Install dependencies:
     ```
@@ -15,15 +25,10 @@
     ```
     npm run-script build
     ```
-3. Verify that index.js is copied under /build directory. Change owner group of the build script in the deploy directory:<br/>
-  **Note: You will need to have the root permission to perform the following task.**
-    ```
-    sudo chmod a+x deploy/build.sh
-    ```
-4. Run build script to create an image for the container under deploy directory:
-    ```
-    cd deploy/ && ./build.sh
-    ```
+3. Package the microservice
+   ```
+   npm run-script package
+   ```
 
 ## Deploying
 1. Make sure that you have downloaded the [latest edgeSDK](https://github.com/mimikgit/edgeSDK/releases) and it is [running correctly](https://github.com/mimikgit/edgeSDK/wiki) on your targeted development platform.
