@@ -58,4 +58,5 @@ typings/
 .env
 
 # Anything in the build folder
-build/*
+build
+deploy
