@@ -55,7 +55,7 @@ function makeTokenModel(context) {
       const { status } = JSON.parse(item);
       return status === 'cancelled';
     }
-    return false;
+    return true;
   }
 
   return {
