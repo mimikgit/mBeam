@@ -33,6 +33,7 @@ function makeTokenProcessor(context) {
           url: `/files?id=${token}`,
           status: 'active',
           viewCount: 0,
+          lastViewedAt: 0,
         }));
       } catch (err) {
         cb(err);

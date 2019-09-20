@@ -1,5 +1,6 @@
 const response = require('edge-ms-helper/response-helper');
 const makeFileProcessor = require('../processors/fileProcessor');
+const { ParameterError } = require('../models/errors');
 
 function getFile(req, res) {
   const { ownerCode, id } = req.swagger.params;
@@ -8,33 +9,19 @@ function getFile(req, res) {
 
   if (ownerCode) {
     if (ownerCode !== context.env.ownerCode) {
-      response.sendError({ message: 'incorrect ownerCode' }, 403, res);
+      response.sendHttpError(new ParameterError('incorrect ownerCode'), res);
     } else {
       fileProcessor.getFile(id)
         .next(data => res.writeMimeFile(data.url, data.mimeType))
-        .guard((err) => {
-          try {
-            const json = JSON.parse(err.message);
-            response.sendError(json.message, json.statusCode, res);
-          } catch (e) {
-            response.sendError(err, 400, res);
-          }
-        })
+        .guard(error => response.sendHttpError(error, res))
         .go();
     }
   } else if (!context.env.signatureKey) {
-    response.sendError({ message: 'edge container is missing "signatureKey"' }, 403, res);
+    response.sendHttpError(new ParameterError('edge container is missing "signatureKey"'), res);
   } else {
     fileProcessor.getFileWithSignature(id)
       .next(data => res.writeMimeFile(data.url, data.mimeType))
-      .guard((err) => {
-        try {
-          const json = JSON.parse(err.message);
-          response.sendError(json, json.statusCode, res);
-        } catch (e) {
-          response.sendError(err, 400, res);
-        }
-      })
+      .guard(error => response.sendHttpError(error, res))
       .go();
   }
 }

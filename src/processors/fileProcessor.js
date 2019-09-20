@@ -2,6 +2,7 @@
 
 const Action = require('action-js');
 const makeTokenModel = require('../models/token');
+const { NotFoundError, ParameterError } = require('../models/errors');
 const jwt = require('../helpers/jwt');
 const base64 = require('../helpers/base64');
 
@@ -13,17 +14,14 @@ function makeFileProcessor(context) {
     return new Action((cb) => {
       try {
         const json = base64.urlDecode(token);
-        if (!json) throw new Error('invalid file id');
-        const { jti, c, b } = JSON.parse(json);
+        if (!json) throw new ParameterError('invalid file id');
+        const { jti, c: url, b: mimeType } = JSON.parse(json);
 
         if (tokenModel.isCancelled(jti)) {
-          throw new Error(JSON.stringify({
-            message: 'User has cancelled beam',
-            statusCode: 404,
-          }));
+          throw new NotFoundError('User has cancelled beam');
         }
-        tokenModel.updateViewCount(jti);
-        cb({ url: c, mimeType: b });
+        tokenModel.updateViews(jti);
+        cb({ url, mimeType });
       } catch (err) {
         cb(err);
       }
@@ -33,15 +31,12 @@ function makeFileProcessor(context) {
   function getFileWithSignature(token) {
     return new Action((cb) => {
       try {
-        const { jti, c, b } = jwt.decode(token, signatureKey, false, 'HS256');
+        const { jti, c: url, b: mimeType } = jwt.decode(token, signatureKey, false, 'HS256');
         if (tokenModel.isCancelled(jti)) {
-          throw new Error(JSON.stringify({
-            message: 'User has cancelled beam',
-            statusCode: 404,
-          }));
+          throw new NotFoundError('User has cancelled beam');
         }
-        tokenModel.updateViewCount(jti);
-        cb({ url: c, mimeType: b });
+        tokenModel.updateViews(jti);
+        cb({ url, mimeType });
       } catch (err) {
         cb(err);
       }

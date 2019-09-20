@@ -1,7 +1,6 @@
-
-const makeQueueModel = require('../models/queue');
-
 const Action = require('action-js');
+const makeQueueModel = require('../models/queue');
+const { NotFoundError } = require('../models/errors');
 
 function makeQueueProcessor(context) {
   const queueModel = makeQueueModel(context);
@@ -24,7 +23,7 @@ function makeQueueProcessor(context) {
     return new Action((cb) => {
       const item = queueModel.get(itemId);
       if (!item) {
-        return cb(new Error(`no such item: ${itemId}`));
+        return cb(new NotFoundError(`no such item: ${itemId}`));
       }
       return cb(JSON.parse(item));
     });
