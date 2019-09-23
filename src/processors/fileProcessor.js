@@ -1,5 +1,3 @@
-
-
 const Action = require('action-js');
 const makeTokenModel = require('../models/token');
 const { NotFoundError, ParameterError } = require('../models/errors');

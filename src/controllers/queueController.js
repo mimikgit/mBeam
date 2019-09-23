@@ -1,4 +1,3 @@
-
 const response = require('edge-ms-helper/response-helper');
 const makeQueueProcessor = require('../processors/queueProcessor');
 const { ParameterError } = require('../models/errors');

@@ -11,8 +11,7 @@ function makeTokenProcessor(context) {
 
   function createToken(json) {
     return new Action((cb) => {
-      const tokenRequest = JSON.parse(json);
-      const { url, mimeType, expIn } = tokenRequest;
+      const { url, mimeType, expIn } = json;
       const exp = Math.round(new Date(new Date().getTime() + (expIn * 1000)).getTime() / 1000);
       if (!signatureKey) {
         throw new Error('edge container is missing "signatureKey"');
