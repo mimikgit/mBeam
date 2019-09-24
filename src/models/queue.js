@@ -1,7 +1,9 @@
 const uuid = require('../helpers/uuid');
+const makeTokenModel = require('./token');
 
 function makeQueueModel(context) {
   const { storage } = context;
+  const TOKEN_PREFIX = makeTokenModel(context).PREFIX;
 
   function get(itemId) {
     return storage.getItem(itemId);
@@ -10,8 +12,10 @@ function makeQueueModel(context) {
   function getAll() {
     const list = [];
     storage.eachItem((key, value) => {
-      const item = JSON.parse(value);
-      list.push(item);
+      if (!key.startsWith(TOKEN_PREFIX)) {
+        const item = JSON.parse(value);
+        list.push(item);
+      }
     });
     return list;
   }

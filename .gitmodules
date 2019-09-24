@@ -1,6 +1,3 @@
 [submodule "swagger-mbeam"]
 	path = swagger-mbeam
 	url = https://bitbucket.org/mimiktech/swagger-mbeam.git
-[submodule "src/edge-ms-helper"]
-	path = src/edge-ms-helper
-	url = https://bitbucket.org/mimiktech/edge-ms-helper.git
