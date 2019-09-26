@@ -41,7 +41,14 @@ function makeTokenProcessor(context) {
   }
 
   function getTokens() {
-    return new Action(cb => cb(tokenModel.getAll()));
+    return new Action(cb => cb(
+      tokenModel
+        .getAll()
+        .filter((item) => {
+          const { b: mimeType } = jwt.decode(item.token, signatureKey, true, 'HS256');
+          return !mimeType.includes('catalogue');
+        }),
+    ));
   }
 
   function getToken(tokenId) {
