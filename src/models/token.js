@@ -9,7 +9,7 @@ function makeTokenModel(context) {
     return data;
   }
 
-  function getAll() {
+  function findAll() {
     const list = [];
     storage.eachItem((key, value) => {
       if (key.startsWith(PREFIX)) list.push(JSON.parse(value));
@@ -17,10 +17,20 @@ function makeTokenModel(context) {
     return list;
   }
 
-  function get(id) {
+  function findById(id) {
     const item = storage.getItem(`${PREFIX}${id}`);
     if (!item) return new NotFoundError(`No item found with id: ${id}`);
     return JSON.parse(item);
+  }
+
+  function findCatalogue(url, expires) {
+    let item = null;
+    storage.eachItem((key, value) => {
+      if (item || !key.startsWith(PREFIX)) return;
+      const json = JSON.parse(value);
+      if (json.originalUrl === url && json.expires_in === expires) item = json;
+    });
+    return item;
   }
 
   function update(id, data) {
@@ -64,8 +74,9 @@ function makeTokenModel(context) {
   return {
     PREFIX,
     insert,
-    getAll,
-    get,
+    findAll,
+    findById,
+    findCatalogue,
     update,
     updateViews,
     remove,
