@@ -11,7 +11,9 @@ function makeTokenProcessor(context) {
 
   function createToken(json) {
     return new Action((cb) => {
-      const { url, mimeType, expIn } = json;
+      const {
+        url, mimeType, name, thumbnailContentHint, toNodeId, expIn,
+      } = json;
       const exp = Math.round(new Date(new Date().getTime() + (expIn * 1000)).getTime() / 1000);
       if (!signatureKey) {
         throw new Error('edge container is missing "signatureKey"');
@@ -29,10 +31,13 @@ function makeTokenProcessor(context) {
           tokenEntity = tokenModel.insert({
             id,
             token,
+            name,
+            thumbnailContentHint,
             mimeType,
-            expires_in: exp,
-            originalUrl: url,
-            url: `/files?id=${token}`,
+            toNodeId,
+            expires: exp,
+            url,
+            filePath: `/files?id=${token}`,
             status: 'active',
             viewCount: 0,
             lastViewedAt: 0,

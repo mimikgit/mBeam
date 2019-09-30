@@ -28,7 +28,7 @@ function makeTokenModel(context) {
     storage.eachItem((key, value) => {
       if (item || !key.startsWith(PREFIX)) return;
       const json = JSON.parse(value);
-      if (json.originalUrl === url && json.expires_in === expires) item = json;
+      if (json.url === url && json.expires === expires) item = json;
     });
     return item;
   }
