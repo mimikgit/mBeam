@@ -37,7 +37,7 @@ function makeTokenProcessor(context) {
             toNodeId,
             expires: exp,
             url,
-            filePath: `/files?id=${token}`,
+            playQueueUrl: `/files?id=${token}`,
             status: 'active',
             viewCount: 0,
             lastViewedAt: 0,
