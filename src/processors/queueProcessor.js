@@ -16,12 +16,12 @@ function makeQueueProcessor(context) {
   }
 
   function getItemList() {
-    return new Action(cb => cb(queueModel.getAll()));
+    return new Action(cb => cb(queueModel.findAll()));
   }
 
   function getItem(itemId) {
     return new Action((cb) => {
-      const item = queueModel.get(itemId);
+      const item = queueModel.findById(itemId);
       if (!item) {
         return cb(new NotFoundError(`no such item: ${itemId}`));
       }
