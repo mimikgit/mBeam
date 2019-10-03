@@ -12,7 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "action-js": "^4.3.0",
-    "edge-ms-helper": "bitbucket:mimiktech/edge-ms-helper.git#bc0c8fb",
+    "edge-ms-helper": "bitbucket:mimiktech/edge-ms-helper.git#v1.0.0",
     "fast-sha256": "^1.1.0",
     "jsonschema": "^1.1.1",
     "lodash": "^4.17.15",
@@ -21,8 +21,8 @@
     "router": "^1.3.3"
   },
   "devDependencies": {
-    "swagger-mw-codegen": "bitbucket:mimiktech/swagger-mw-codegen.git#bc97a6d",
-    "edge-ms-packager": "bitbucket:mimiktech/edge-ms-packager.git#dfaa101",
+    "swagger-mw-codegen": "bitbucket:mimiktech/swagger-mw-codegen.git#v1.0.0",
+    "edge-ms-packager": "bitbucket:mimiktech/edge-ms-packager.git#v1.0.0",
     "babel-core": "^6.26.3",
     "babel-eslint": "^7.2.0",
     "babel-jest": "^24.8.0",
