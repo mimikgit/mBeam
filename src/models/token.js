@@ -49,12 +49,12 @@ function makeTokenModel(context) {
 
     const updatedItem = JSON.parse(item);
     const now = Math.round(new Date().getTime() / 1000);
-    if (!updatedItem.lastViewedAt || now - updatedItem.lastViewedAt > 60) {
+    if (!updatedItem.lastViewedAt || now - updatedItem.lastViewedAt >= 60) {
       updatedItem.viewCount = updatedItem.viewCount || 0;
       updatedItem.viewCount += 1;
       updatedItem.lastViewedAt = now;
+      storage.setItem(`${PREFIX}${id}`, JSON.stringify(updatedItem));
     }
-    storage.setItem(`${PREFIX}${id}`, JSON.stringify(updatedItem));
     return updatedItem;
   }
 
