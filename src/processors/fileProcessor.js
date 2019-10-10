@@ -8,17 +8,14 @@ function makeFileProcessor(context) {
   const { signatureKey } = context.env;
   const tokenModel = makeTokenModel(context);
 
+  // No signature verification, only used when ownerCode provided
   function getFile(token) {
     return new Action((cb) => {
       try {
         const json = base64.urlDecode(token);
         if (!json) throw new ParameterError('invalid file id');
-        const { jti, c: url, b: mimeType } = JSON.parse(json);
+        const { c: url, b: mimeType } = JSON.parse(json);
 
-        if (tokenModel.isCancelled(jti)) {
-          throw new NotFoundError('User has cancelled beam');
-        }
-        tokenModel.updateViews(jti);
         cb({ url, mimeType });
       } catch (err) {
         cb(err);
