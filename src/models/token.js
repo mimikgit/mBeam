@@ -48,10 +48,13 @@ function makeTokenModel(context) {
     if (!item) return new NotFoundError(`No item found with id: ${id}`);
 
     const updatedItem = JSON.parse(item);
-    updatedItem.viewCount = updatedItem.viewCount || 0;
-    updatedItem.viewCount += 1;
-    updatedItem.lastViewedAt = Math.round(new Date().getTime() / 1000);
-    storage.setItem(`${PREFIX}${id}`, JSON.stringify(updatedItem));
+    const now = Math.round(new Date().getTime() / 1000);
+    if (!updatedItem.lastViewedAt || now - updatedItem.lastViewedAt >= 60) {
+      updatedItem.viewCount = updatedItem.viewCount || 0;
+      updatedItem.viewCount += 1;
+      updatedItem.lastViewedAt = now;
+      storage.setItem(`${PREFIX}${id}`, JSON.stringify(updatedItem));
+    }
     return updatedItem;
   }
 
