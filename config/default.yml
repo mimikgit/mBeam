@@ -3,6 +3,7 @@ api:
   name: beam
   swagger: swagger-mbeam/mbeam-api-swagger.yml
   controllerPath: ../src/controllers
+  securityHandlerPath: ../src/securityHandlers
   outputPath: ./build
 package:
   imageName: beam

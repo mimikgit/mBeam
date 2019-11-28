@@ -15,13 +15,12 @@
     "edge-ms-helper": "bitbucket:mimiktech/edge-ms-helper.git#v1.0.0",
     "fast-sha256": "^1.1.0",
     "jsonschema": "^1.1.1",
-    "lodash": "^4.17.15",
     "parseurl": "^1.3.3",
     "query-string": "^4.3.4",
     "router": "^1.3.3"
   },
   "devDependencies": {
-    "swagger-mw-codegen": "bitbucket:mimiktech/swagger-mw-codegen.git#v1.0.0",
+    "swagger-mw-codegen": "bitbucket:mimiktech/swagger-mw-codegen.git#dbad803",
     "edge-ms-packager": "bitbucket:mimiktech/edge-ms-packager.git#v1.0.0",
     "babel-core": "^6.26.3",
     "babel-eslint": "^7.2.0",
