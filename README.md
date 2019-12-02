@@ -1,4 +1,5 @@
 # mBeam
+---
 
 This open source mBeam microservice created by the mimik team is an example cross-platform solution for media streaming. More specifically, this edgeSDK microservice has the following functionality:
 
@@ -7,6 +8,7 @@ This open source mBeam microservice created by the mimik team is an example cros
 
 
 # Build Process
+---
 
 The build script **default.yml** is specified under **config** directory.
 
@@ -15,6 +17,7 @@ The build script **default.yml** is specified under **config** directory.
 3. Package to container: ```npm run package```
 
 # Deployment
+---
 
 For **mobile application development**, deployment is programmatically by **Android or iOS Wrappers**, learn more about it:
 
@@ -28,13 +31,13 @@ For **microservice development**, things you will need:
 - Run the following commands under the same directory of your containerized microservice file:
 
 ```
-curl -i -H 'Authorization: Bearer **Replace withYourToken**' -F "image=@beam-v1.tar" http://localhost:8083/mcm/v1/images
+curl -i -H 'Authorization: Bearer <edge Access Token>' -F "image=@beam-v1.tar" http://localhost:8083/mcm/v1/images
 ```
 
 - To run the microservice after successful deployment, with environment variables:
 
 ```
-curl -i -H 'Authorization: Bearer **ReplacewithYourToken**' -d '{"name": "beam-v1", "image": "beam-v1", "env": {"MCM.BASE_API_PATH": "/beam/v1", "MCM.WEBSOCKET_SUPPORT": "true", "ownerCode": **ReplacewithYourOwnerCode**, "signatureKey": **ReplacewithYourSignatureKey**} }' http://localhost:8083/mcm/v1/containers
+curl -i -H 'Authorization: Bearer <edge Access Token>' -d '{"name": "beam-v1", "image": "beam-v1", "env": {"MCM.BASE_API_PATH": "/beam/v1", "MCM.WEBSOCKET_SUPPORT": "true", "ownerCode": <YourOwnerCode>, "signatureKey": <YourSignatureKey>} }' http://localhost:8083/mcm/v1/containers
 ```
 
 - For more information and explanation, you can visit our [mCM container management API references](https://developer.mimik.com/resources/documentation/latest/getting-started/quick-start) and [general guide on packaing, deployment, and exporting microservice](https://developer.mimik.com/resources/documentation/latest/apis/mcm).
