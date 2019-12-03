@@ -5,7 +5,6 @@ const jwt = require('../helpers/jwt');
 const base64 = require('../helpers/base64');
 
 function makeFileProcessor(context) {
-  const { signatureKey } = context.env;
   const tokenModel = makeTokenModel(context);
 
   // No signature verification, only used when ownerCode provided
@@ -25,16 +24,12 @@ function makeFileProcessor(context) {
 
   function getFileWithSignature(token) {
     return new Action((cb) => {
-      try {
-        const { jti, c: url, b: mimeType } = jwt.decode(token, signatureKey, false, 'HS256');
-        if (tokenModel.isCancelled(jti)) {
-          throw new NotFoundError('User has cancelled beam');
-        }
-        tokenModel.updateViews(jti);
-        cb({ url, mimeType });
-      } catch (err) {
-        cb(err);
+      const { jti, c: url, b: mimeType } = jwt.decode(token, null, true, 'HS256');
+      if (tokenModel.isCancelled(jti)) {
+        throw new NotFoundError('User has cancelled beam');
       }
+      tokenModel.updateViews(jti);
+      cb({ url, mimeType });
     });
   }
 
