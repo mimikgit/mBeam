@@ -1,35 +1,29 @@
-const webpack = require('webpack');
 const path = require('path');
+const TerserPlugin = require('terser-webpack-plugin');
 
 const BUILD_DIR = path.resolve(__dirname, 'build');
 const SRC_DIR = path.resolve(__dirname, 'src');
 
-const config = {
+module.exports = {
+  mode: 'production',
   entry: [`${SRC_DIR}/index.js`],
   output: {
     path: BUILD_DIR,
     filename: 'index.js',
   },
-  plugins: [
-    new webpack.optimize.ModuleConcatenationPlugin(),
-    new webpack.optimize.UglifyJsPlugin({
-      compress: {
-        warnings: false,
-        screw_ie8: true,
-        conditionals: true,
-        unused: true,
-        comparisons: true,
-        sequences: true,
-        dead_code: true,
-        evaluate: true,
-        join_vars: true,
-        if_return: true,
-      },
-      output: {
-        comments: false,
-      },
-    }),
-  ],
+  optimization: {
+    minimize: true,
+    minimizer: [
+      new TerserPlugin({
+        terserOptions: {
+          output: {
+            comments: false,
+          },
+        }
+      }),
+    ],
+    concatenateModules: true,
+  },
   module: {
     rules: [
       {
@@ -41,14 +35,11 @@ const config = {
       {
         test: /\.js$/,
         exclude: /node_modules\/(?!edge-ms-helper)/,
-        // exclude: /node_modules/,
         query: {
-          presets: ['es2015', 'stage-0'],
+          presets: ['@babel/preset-env'],
         },
         loader: 'babel-loader',
       },
     ],
   },
 };
-
-module.exports = config;

@@ -1,5 +1,3 @@
-
-
 const Action = require('action-js');
 const makeTokenModel = require('../models/token');
 const uuid = require('../helpers/uuid');

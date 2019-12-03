@@ -1,6 +1,6 @@
 const Action = require('action-js');
+const { NotFoundError } = require('edge-ms-helper/error-helper');
 const makeQueueModel = require('../models/queue');
-const { NotFoundError } = require('../models/errors');
 
 function makeQueueProcessor(context) {
   const queueModel = makeQueueModel(context);

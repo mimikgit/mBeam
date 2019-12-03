@@ -1,7 +1,7 @@
 const Action = require('action-js');
-const makeTokenModel = require('../models/token');
-const { NotFoundError, ParameterError } = require('../models/errors');
+const { NotFoundError, ParameterError } = require('edge-ms-helper/error-helper');
 const jwt = require('../helpers/jwt');
+const makeTokenModel = require('../models/token');
 const base64 = require('../helpers/base64');
 
 function makeFileProcessor(context) {
