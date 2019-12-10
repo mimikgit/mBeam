@@ -7,11 +7,11 @@ function createToken(req, res) {
   const tokenProcessor = makeTokenProcessor(context);
 
   if (!context.env.signatureKey) {
-    response.sendHttpError(new Error('edge container is missing "signatureKey"'), res);
+    response.sendError(new Error('edge container is missing "signatureKey"'), res);
   } else {
     tokenProcessor.createToken(tokenData)
       .next(data => response.sendResult({ data }, 200, res))
-      .guard(err => response.sendHttpError(err, res))
+      .guard(err => response.sendError(err, res))
       .go();
   }
 }
@@ -22,7 +22,7 @@ function getTokens(req, res) {
 
   tokenProcessor.getTokens()
     .next(data => response.sendResult({ data }, 200, res))
-    .guard(err => response.sendHttpError(err, res))
+    .guard(err => response.sendError(err, res))
     .go();
 }
 
@@ -33,7 +33,7 @@ function getTokenById(req, res) {
 
   tokenProcessor.getToken(id)
     .next(data => response.sendResult({ data }, 200, res))
-    .guard(err => response.sendHttpError(err, res))
+    .guard(err => response.sendError(err, res))
     .go();
 }
 
@@ -44,7 +44,7 @@ function updateToken(req, res) {
 
   tokenProcessor.updateToken(id, tokenData)
     .next(data => response.sendResult({ data }, 200, res))
-    .guard(err => response.sendHttpError(err, res))
+    .guard(err => response.sendError(err, res))
     .go();
 }
 
@@ -55,7 +55,7 @@ function deleteToken(req, res) {
 
   tokenProcessor.deleteToken(id)
     .next(data => response.sendResult({ data }, 200, res))
-    .guard(err => response.sendHttpError(err, res))
+    .guard(err => response.sendError(err, res))
     .go();
 }
 

@@ -1,0 +1,14 @@
+language: node_js
+node_js:
+  - 11
+deploy:
+  provider: releases
+  api_key: $GIT_TOKEN
+  file: deploy/beam-v1.tar
+  skip_cleanup: true
+  on:
+    tags: true
+script:
+  - npm run build
+  - npm run package
+  

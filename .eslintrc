@@ -1,5 +1,5 @@
 {
-  "extends": "airbnb",
+  "extends": "airbnb-base",
   "globals": {
     "mimikModule": true,
     "Duktape": true,
@@ -9,6 +9,7 @@
   "rules": {
       "linebreak-style": "off",
       "no-warning-comments": "off",
+      "arrow-parens": ["error", "as-needed", { "requireForBlockBody": true }],
       "no-console": "off",
       "jsx-a11y/img-has-alt": "off",
       "jsx-a11y/label-uses-for": "off",
@@ -18,4 +19,5 @@
       "jsx-a11y/valid-aria-role": "off",
       "no-underscore-dangle": "off"
     },
+    "parser": "babel-eslint"
 }

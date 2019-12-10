@@ -1,4 +1,4 @@
-const { NotFoundError } = require('./errors');
+const { NotFoundError } = require('edge-ms-helper/error-helper');
 
 function makeTokenModel(context) {
   const { storage } = context;

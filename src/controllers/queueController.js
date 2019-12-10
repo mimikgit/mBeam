@@ -9,7 +9,7 @@ function createItem(req, res) {
   const allowDelete = !!ownerCode && ownerCode === context.env.ownerCode;
   queueProcessor.createItem(item, allowDelete)
     .next((createdItem => response.sendResult(createdItem, 200, res)))
-    .guard(err => response.sendHttpError(err, res))
+    .guard(err => response.sendError(err, res))
     .go();
 }
 
@@ -19,7 +19,7 @@ function getItemList(req, res) {
 
   queueProcessor.getItemList()
     .next((data => response.sendResult({ data }, 200, res)))
-    .guard(err => response.sendHttpError(err, res))
+    .guard(err => response.sendError(err, res))
     .go();
 }
 
@@ -30,7 +30,7 @@ function getItem(req, res) {
 
   queueProcessor.getItem(id)
     .next((item => response.sendResult(item, 200, res)))
-    .guard(err => response.sendHttpError(err, res))
+    .guard(err => response.sendError(err, res))
     .go();
 }
 
@@ -41,7 +41,7 @@ function deleteItem(req, res) {
 
   queueProcessor.deleteItem(id)
     .next((item => response.sendResult(item, 200, res)))
-    .guard(err => response.sendHttpError(err, res))
+    .guard(err => response.sendError(err, res))
     .go();
 }
 
@@ -52,7 +52,7 @@ function setItemReadStatus(req, res) {
 
   queueProcessor.setReadStatus(id, queueUpdate)
     .next((item => response.sendResult(item, 200, res)))
-    .guard(err => response.sendHttpError(err, res))
+    .guard(err => response.sendError(err, res))
     .go();
 }
 
