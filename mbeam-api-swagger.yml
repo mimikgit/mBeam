@@ -1,0 +1,499 @@
+swagger: '2.0'
+info:
+  version: "1.2.0"
+  title: mBeam API
+  description: |
+    This microsevice is defined to do the following:
+      * Provide a queue of links to shared media.
+      * Beam content from one node to another, through an API call.
+    
+  contact:
+    name: mimik
+    url: 'https://mimik.com/'
+    email: support.sdk@mimik.com
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+tags:
+  - name: Play Queue
+  - name: Files
+  - name: Tokens
+paths:
+  /play_queue:
+    post:
+      operationId: createItem
+      tags:
+        - Play Queue
+      description: |
+        Creates a beam item on the target machine's play queue.
+      parameters:
+        - name: ownerCode
+          in: query
+          type: string
+          required: false
+          description: Optional ownerCode to control use of deletableTime
+        - name: item
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/MediaMetadata'
+      responses:
+        200:
+          description: Successful response, returns the item added
+          schema:
+            $ref: '#/definitions/MediaMetadata'
+        400:
+          $ref: '#/responses/400'
+      x-swagger-router-controller: queueController
+    get:
+      operationId: getItemList
+      tags:
+        - Play Queue
+      description: |
+        Get a list of item posted. Currently the maximum kept in this play_queue is 5 items
+      security:
+        - OwnerCode: []
+      parameters:
+        - $ref: '#/parameters/OwnerCode'
+      responses:
+        200: 
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '#/definitions/ItemList'
+        403:
+          $ref: '#/responses/403'
+        500:
+          $ref: '#/responses/500'
+      x-swagger-router-controller: queueController
+  /play_queue/{id}:
+    get:
+      operationId: getItem
+      tags:
+        - Play Queue
+      description: Get an item by ID from the play queue
+      security:
+        - OwnerCode: []
+      parameters:
+        - $ref: '#/parameters/ItemId'
+        - $ref: '#/parameters/OwnerCode'
+      responses:
+        200:
+          description: Successful response, returns the object requested
+          schema:
+            $ref: '#/definitions/MediaMetadata'
+        400:
+          $ref: '#/responses/400'
+      x-swagger-router-controller: queueController
+    put:
+      operationId: setItemReadStatus
+      tags:
+        - Play Queue
+      description: Change the readStatus of an item
+      security:
+        - OwnerCode: []
+      parameters:
+        - $ref: '#/parameters/ItemId'
+        - $ref: '#/parameters/OwnerCode'
+        - $ref: '#/parameters/QueueUpdate'
+      responses:
+        200:
+          description: Successful response, returns the object requested
+          schema:
+            $ref: '#/definitions/MediaMetadata'
+        400:
+          $ref: '#/responses/400'
+      x-swagger-router-controller: queueController
+    delete:
+      operationId: deleteItem
+      tags:
+        - Play Queue
+      description: Remove an item by ID from the play queue
+      security:
+        - OwnerCode: []
+      parameters:
+        - $ref: '#/parameters/ItemId'
+        - $ref: '#/parameters/OwnerCode'
+      responses:
+        200:
+          description: Successful response, returns item which was deleted
+          schema:
+            $ref: '#/definitions/MediaMetadata'
+        400:
+          $ref: '#/responses/400'
+        403:
+          $ref: '#/responses/403'
+      x-swagger-router-controller: queueController
+  /files:
+    get:
+      operationId: getFile
+      tags:
+        - Files
+      security:
+        - FileToken: []
+        - OwnerCode: []
+      description: Get a file by ID
+      parameters:
+        - name: id
+          in: query
+          type: string
+          required: true
+          description: |
+            JWT token representing the file. May be generated using the [/tokens](#/User/createToken) endpoint, or returned from a play queue.
+            Example:
+            ```
+            eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiI1NmVjMTVjYy0wZmRjLTQ1MWUtOWVmZi1hZWRmODRiNzViZTQiLCJiIjoiaW1hZ2UvanBlZyIsImMiOiIvc3RvcmFnZS9lbXVsYXRlZC8wL0FuZHJvaWQvZGF0YS9jb20ubWltaWsuYWNjZXNzZGV2L2NhY2hlL21pbWlrX2NhY2hlL0wzTjBiM0poWjJVdlpXMTFiR0YwWldRdk1DOUVRMGxOTDFOamNtVmxibk5vYjNSekwxTmpjbVZsYm5Ob2IzUmZNakF4T1RBeU1EY3RNVEV6TXpNelgwTm9jbTl0WlM1cWNHYy5qcGciLCJleHAiOjE1NTI2ODk3MzR9.IxBuPtywhrVXG5A3C4w_VOZ_PiaRAdpbUoxypxcGc24
+            ```
+        - name: ownerCode
+          in: query
+          description: |
+            A unique key used to verify ownership of files.
+            This should be the same value used to deploy the mBeam micro service.
+          required: false
+          type: string
+      responses:
+        200:
+          description: Successful response, contents of file
+        400: 
+          $ref: '#/responses/400'
+      x-swagger-router-controller: fileController
+  /tokens:
+    post:
+      operationId: createToken
+      x-swagger-router-controller: tokenController
+      tags:
+        - Tokens
+      description: |
+        Generate a JWT token and URI that provides access to a file
+      security:
+        - OwnerCode: []
+      parameters:
+        - $ref: '#/parameters/OwnerCode'
+        - name: tokenData
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/FileAccessTokenRequest'
+      responses:
+        200:
+          description: Successful response, returns a JSON object containing the JWT token and a URI for file access
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '#/definitions/FileAccessTokenResponseData'
+        400: 
+          $ref: '#/responses/400'
+    get:
+      operationId: getTokens
+      x-swagger-router-controller: tokenController
+      tags:
+        - Tokens
+      description: Retrieve a list of tokens that you created.
+      security:
+        - OwnerCode: []
+      parameters:
+        - $ref: '#/parameters/OwnerCode'
+      responses:
+        200:
+          description: Successful response, returns an array of JSON objects containing the JWT token and a URI for file access
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/definitions/FileAccessTokenResponseData'
+        400: 
+          $ref: '#/responses/400'
+  
+  /tokens/{id}:
+    get:
+      operationId: getTokenById
+      x-swagger-router-controller: tokenController
+      tags:
+        - Tokens
+      description: Retrieve information about a specific token that you created.
+      security:
+        - OwnerCode: []
+      parameters:
+        - $ref: '#/parameters/TokenId'
+        - $ref: '#/parameters/OwnerCode'
+      responses:
+        200:
+          description: Successful response, returns a JSON object containing the JWT token and a URI for file access
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '#/definitions/FileAccessTokenResponseData'
+        400: 
+          $ref: '#/responses/400'
+    put:
+      operationId: updateToken
+      x-swagger-router-controller: tokenController
+      tags:
+        - Tokens
+      description: Update a specific token that you created.
+      security:
+        - OwnerCode: []
+      parameters:
+        - $ref: '#/parameters/TokenId'
+        - $ref: '#/parameters/OwnerCode'
+        - name: tokenData
+          in: body
+          required: true
+          schema:
+            properties:
+              status:
+                type: string
+                description: Possible values include active or cancelled
+                enum:
+                  - active
+                  - cancelled
+      responses:
+        200:
+          description: Successful response, returns a JSON object containing the JWT token and a URI for file access
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '#/definitions/FileAccessTokenResponseData'
+        400: 
+          $ref: '#/responses/400'
+    delete:
+      operationId: deleteToken
+      x-swagger-router-controller: tokenController
+      tags:
+        - Tokens
+      description: Delete a specific token that you created.
+      security:
+        - OwnerCode: []
+      parameters:
+        - $ref: '#/parameters/TokenId'
+        - $ref: '#/parameters/OwnerCode'
+      responses:
+        200:
+          description: Successful response, returns a JSON object containing the JWT token and a URI for file access
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '#/definitions/FileAccessTokenResponseData'
+        400: 
+          $ref: '#/responses/400'
+
+definitions:
+  ItemList:
+    type: array
+    description: An array of media items
+    items: 
+      $ref: '#/definitions/MediaMetadata'
+  MediaMetadata:
+    type: object
+    required: [name, mimeType, url, nodeId, thumbnailContentHint]
+    properties:
+      id:
+        type: string
+        example: "001f7591-4102-4cd6-9ece-e21f03cc0d5f"
+      name:
+        type: string
+        example: "IMG_20171205_101453015.jpg"
+      mimeType:
+        type: string
+        example: "image/jpeg"
+      url:
+        type: string
+        example: "http://172.22.2.20:8083/beam/v1/files?id=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiI1NmVjMTVjYy0wZmRjLTQ1MWUtOWVmZi1hZWRmODRiNzViZTQiLCJiIjoiaW1hZ2UvanBlZyIsImMiOiIvc3RvcmFnZS9lbXVsYXRlZC8wL0FuZHJvaWQvZGF0YS9jb20ubWltaWsuYWNjZXNzZGV2L2NhY2hlL21pbWlrX2NhY2hlL0wzTjBiM0poWjJVdlpXMTFiR0YwWldRdk1DOUVRMGxOTDFOamNtVmxibk5vYjNSekwxTmpjbVZsYm5Ob2IzUmZNakF4T1RBeU1EY3RNVEV6TXpNelgwTm9jbTl0WlM1cWNHYy5qcGciLCJleHAiOjE1NTI2ODk3MzR9.IxBuPtywhrVXG5A3C4w_VOZ_PiaRAdpbUoxypxcGc24"
+      nodeId:
+        type: string
+        example: "d9bd4359cd0ba52c"
+      thumbnailContentHint:
+        $ref: '#/definitions/ThumbnailContentHint'
+      createTime:
+        type: string
+        example: "2018-02-13T23:12:20.006Z"
+      readStatus:
+        type: string
+        enum:
+          - read
+          - unread
+        example: unread
+        default: unread
+      deletableTime:
+        type: string
+        format: date-time
+        description: Time after which the beam item can be deleted
+        example: "2018-02-13T23:12:20.006Z"
+  ThumbnailContentHint:
+    type: object
+    required:
+      - image
+      - mimeType
+    properties:
+      image:
+        type: string
+        maxLength: 75000
+        description: |
+          The thumbnail data encoded with URL-safe Base64 (RFC 4648 section 5).
+      mimeType:
+        type: string
+        description: |
+          The MIME type of the thumbnail.
+  FileAccessToken:
+    type: string
+    description: |
+      JWT token representing the file
+    example: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiI1NmVjMTVjYy0wZmRjLTQ1MWUtOWVmZi1hZWRmODRiNzViZTQiLCJiIjoiaW1hZ2UvanBlZyIsImMiOiIvc3RvcmFnZS9lbXVsYXRlZC8wL0FuZHJvaWQvZGF0YS9jb20ubWltaWsuYWNjZXNzZGV2L2NhY2hlL21pbWlrX2NhY2hlL0wzTjBiM0poWjJVdlpXMTFiR0YwWldRdk1DOUVRMGxOTDFOamNtVmxibk5vYjNSekwxTmpjbVZsYm5Ob2IzUmZNakF4T1RBeU1EY3RNVEV6TXpNelgwTm9jbTl0WlM1cWNHYy5qcGciLCJleHAiOjE1NTI2ODk3MzR9.IxBuPtywhrVXG5A3C4w_VOZ_PiaRAdpbUoxypxcGc24"
+  FileAccessTokenRequest:
+    required:
+      - url
+      - mimeType
+      - expIn
+    properties:
+      url:
+        type: string
+        description: |
+          URL of the file
+        example: "/path/to/file.jpg"
+      name:
+        type: string
+        example: "IMG_20171205_101453015.jpg"
+      toNodeId:
+        type: string
+        example: "d9bd4359cd0ba52c"
+      thumbnailContentHint:
+        $ref: '#/definitions/ThumbnailContentHint'
+      mimeType:
+        type: string
+        description: MIME type of the file
+        example: "image/jpeg"
+      expIn:
+        type: integer
+        description: |
+          Number of seconds that file access will be valid for
+        example: 3600
+  FileAccessTokenResponseData:
+    properties:
+      id:
+        type: string
+        example: "56ec15cc-0fdc-451e-9eff-aedf84b75be4"
+      token:
+        $ref: '#/definitions/FileAccessToken'
+      name:
+        type: string
+        example: "IMG_20171205_101453015.jpg"
+      toNodeId:
+        type: string
+        example: "d9bd4359cd0ba52c"
+      thumbnailContentHint:
+        $ref: '#/definitions/ThumbnailContentHint'
+      expires:
+        type: integer
+        description: Token expiration time (Unix timestamp)
+      url:
+        type: string
+        description: The original file URL used to create the token
+        example: "/path/to/file.jpg"
+      playQueueUrl:
+        type: string
+        description: |
+          URI for the endpoint that provides access to the file
+        example: "/files?id=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiI1NmVjMTVjYy0wZmRjLTQ1MWUtOWVmZi1hZWRmODRiNzViZTQiLCJiIjoiaW1hZ2UvanBlZyIsImMiOiIvc3RvcmFnZS9lbXVsYXRlZC8wL0FuZHJvaWQvZGF0YS9jb20ubWltaWsuYWNjZXNzZGV2L2NhY2hlL21pbWlrX2NhY2hlL0wzTjBiM0poWjJVdlpXMTFiR0YwWldRdk1DOUVRMGxOTDFOamNtVmxibk5vYjNSekwxTmpjbVZsYm5Ob2IzUmZNakF4T1RBeU1EY3RNVEV6TXpNelgwTm9jbTl0WlM1cWNHYy5qcGciLCJleHAiOjE1NTI2ODk3MzR9.IxBuPtywhrVXG5A3C4w_VOZ_PiaRAdpbUoxypxcGc24"
+      mimeType:
+        type: string
+        description: MIME type of the file
+        example: "image/jpeg"
+      viewCount:
+        type: integer
+        description: The number of times this file has been fetched from the API
+      lastViewedAt:
+        type: integer
+        description: When this file was last fetched from the API (Unix timestamp)
+      status:
+        type: string
+        example: active
+        enum:
+          - active
+          - cancelled
+  Error:
+    type: object
+    required:
+      - code
+      - message
+    properties:
+      code:
+        type: integer
+        description: Must be the same as the HTTP status code.
+      message:
+        type: string
+        description: A human readable code
+  QueueUpdate:
+    properties:
+      readStatus:
+        type: string
+        enum:
+          - read
+          - unread
+responses:
+  400:
+    description: Bad input parameter
+    schema:
+      $ref: '#/definitions/Error'
+  403:
+    description: Forbidden request
+    schema:
+      $ref: '#/definitions/Error'
+  404:
+    description: Resource Not found
+    schema:
+      $ref: '#/definitions/Error'
+  409:
+    description: Resource already exists
+    schema:
+      $ref: '#/definitions/Error'
+  500:
+    description: System error
+    schema:
+      $ref: '#/definitions/Error'
+      
+parameters:
+  OwnerCode:
+    name: ownerCode
+    in: query
+    description: |
+      A unique key used to verify ownership of files.
+      This should be the same value used to deploy the mBeam micro service.
+    required: true
+    type: string
+  ItemId:
+    name: id
+    in: path
+    description: A unique item ID
+    required: true
+    type: string
+  TokenId:
+    name: id
+    in: path
+    description: A unique token ID
+    required: true
+    type: string
+  QueueUpdate:
+    name: queueUpdate
+    schema:
+      $ref: '#/definitions/QueueUpdate'
+    in: body
+    description: |
+      Object containing fields of the beam object to be updated.
+    required: true
+securityDefinitions:
+  OwnerCode:
+    type: apiKey
+    in: query
+    name: ownerCode
+  FileToken:
+    type: apiKey
+    in: query
+    name: id
