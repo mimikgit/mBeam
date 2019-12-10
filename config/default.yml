@@ -1,7 +1,7 @@
 name: mimik
 api:
   name: beam
-  swagger: node_modules/swagger-mbeam/mbeam-api-swagger.yml
+  swagger: mbeam-api-swagger.yml
   controllerPath: ../src/controllers
   securityHandlerPath: ../src/handlers
   outputPath: ./build
