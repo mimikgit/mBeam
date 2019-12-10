@@ -1,4 +1,4 @@
-const jwt = require('../helpers/jwt');
+const jwt = require('../lib/jwt');
 
 function SecurityHandler(req, definition, token, next) {
   const { signatureKey } = req.context.env;

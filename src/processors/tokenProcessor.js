@@ -1,7 +1,7 @@
 const Action = require('action-js');
 const makeTokenModel = require('../models/token');
-const uuid = require('../helpers/uuid');
-const jwt = require('../helpers/jwt');
+const uuid = require('../lib/uuid');
+const jwt = require('../lib/jwt');
 
 function makeTokenProcessor(context) {
   const { signatureKey } = context.env;

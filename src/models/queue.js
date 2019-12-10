@@ -1,4 +1,4 @@
-const uuid = require('../helpers/uuid');
+const uuid = require('../lib/uuid');
 const makeTokenModel = require('./token');
 
 function makeQueueModel(context) {
