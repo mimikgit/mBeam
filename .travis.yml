@@ -6,6 +6,7 @@ deploy:
   api_key: $GIT_TOKEN
   file: deploy/beam-v1.tar
   skip_cleanup: true
+  draft: true
   on:
     tags: true
 script:
