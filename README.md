@@ -7,6 +7,10 @@ This open source mBeam microservice created by the mimik team is an example cros
 2. Beam content from one target device to another
 
 
+## Environment Variables
+signatureKey: the signatureKey is used as a signing secret for the file token
+ownerCode: the ownerCode is used as a secret to protect endpoints according to the swagger API
+
 # Build Process
 ---
 

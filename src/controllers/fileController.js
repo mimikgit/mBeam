@@ -9,12 +9,12 @@ function getFile(req, res) {
   if (ownerCode) {
     fileProcessor.getFile(id)
       .next(data => res.writeMimeFile(data.url, data.mimeType))
-      .guard(error => response.sendHttpError(error, res))
+      .guard(error => response.sendError(error, res))
       .go();
   } else {
     fileProcessor.getFileWithSignature(id)
       .next(data => res.writeMimeFile(data.url, data.mimeType))
-      .guard(error => response.sendHttpError(error, res))
+      .guard(error => response.sendError(error, res))
       .go();
   }
 }
