@@ -1,4 +1,4 @@
-const response = require('edge-ms-helper/response-helper');
+const response = require('@mimik/edge-ms-helper/response-helper');
 const makeTokenProcessor = require('../processors/tokenProcessor');
 
 function createToken(req, res) {

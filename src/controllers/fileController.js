@@ -1,4 +1,4 @@
-const response = require('edge-ms-helper/response-helper');
+const response = require('@mimik/edge-ms-helper/response-helper');
 const makeFileProcessor = require('../processors/fileProcessor');
 
 function getFile(req, res) {
