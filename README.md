@@ -1,4 +1,4 @@
-# mBeam
+# mBeam [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 ---
 
 This open source mBeam microservice created by the mimik team is an example cross-platform solution for media streaming. More specifically, this edgeSDK microservice has the following functionality:
@@ -45,3 +45,10 @@ curl -i -H 'Authorization: Bearer <edge Access Token>' -d '{"name": "beam-v1", "
 ```
 
 - For more information and explanation, you can visit our [mCM container management API references](https://developer.mimik.com/resources/documentation/latest/getting-started/quick-start) and [general guide on packaing, deployment, and exporting microservice](https://developer.mimik.com/resources/documentation/latest/apis/mcm).
+
+
+## Supports
+- https://developer.mimik.com
+
+## License
+[MIT licensed](./LICENSE).

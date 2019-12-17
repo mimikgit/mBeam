@@ -1,4 +1,4 @@
-const { NotFoundError } = require('edge-ms-helper/error-helper');
+const { NotFoundError } = require('@mimik/edge-ms-helper/error-helper');
 
 function makeTokenModel(context) {
   const { storage } = context;

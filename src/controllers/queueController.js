@@ -1,4 +1,4 @@
-const response = require('edge-ms-helper/response-helper');
+const response = require('@mimik/edge-ms-helper/response-helper');
 const makeQueueProcessor = require('../processors/queueProcessor');
 
 function createItem(req, res) {
